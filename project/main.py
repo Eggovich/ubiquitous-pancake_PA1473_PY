@@ -5,7 +5,7 @@ import sys
 
 
 from pybricks.ev3devices import Motor, ColorSensor
-from pybricks.parameters import Port,  Direction
+from pybricks.parameters import Port,  Direction, stop
 from pybricks.tools import wait
 from pybricks.robotics import DriveBase
 
