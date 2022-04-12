@@ -2,6 +2,8 @@
 
 #BIBLIOTEK
 import sys
+
+
 from pybricks.ev3devices import Motor, ColorSensor
 from pybricks.parameters import Port,  Direction
 from pybricks.tools import wait
@@ -9,6 +11,9 @@ from pybricks.robotics import DriveBase
 
 # GLOBALA VARIABLES
 
+
+
+# The logic
 
 def main():
     print('hello')
