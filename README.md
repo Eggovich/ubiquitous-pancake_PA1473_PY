@@ -1,9 +1,9 @@
-# -- Replace with the name of your project --
+# -- Terminator 2.0 --
 
 ## Members of the group
 -- Replace with student information --
-* Adam Svensson adv@bth.se
-* Albin Persson alo@bth.se
+* Simon Gottschalk simon.gottschalk@student.bth.se
+
 
 ## Project Description
 -- Place a short description of the project so that the reader know what the goal of the repository is --
