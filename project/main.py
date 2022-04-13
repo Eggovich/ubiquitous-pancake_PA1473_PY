@@ -11,19 +11,19 @@ from pybricks.robotics import DriveBase
 
 # GLOBALA VARIABLES
 
+# Motor
+left_motor = Motor(Port.B)
+right_motor = Motor(Port.C)
 
+# Color sensor.
+line_sensor = ColorSensor(Port.S3)
+
+# Drive base.
+robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
 
 # The logic under
-def line_follow ():
+def line_follow (robot, line_sensor, left_motor, right_motor): # måste ändra till våra värden!!!!!!!!
     # Initialize the motors.
-    left_motor = Motor(Port.B)
-    right_motor = Motor(Port.C)
-
-# Initialize the color sensor.
-    line_sensor = ColorSensor(Port.S3)
-
-# Initialize the drive base.
-    robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
 
 # Calculate the light threshold. Choose values based on your measurements.
     BLACK = 9
@@ -54,6 +54,8 @@ def line_follow ():
 
         # You can wait for a short time or do other things in this loop.
         wait(10)
+
+def pick_up_fail_detection():
 
 
 # over
