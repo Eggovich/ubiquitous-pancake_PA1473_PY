@@ -11,9 +11,12 @@ from pybricks.robotics import DriveBase
 
 # GLOBALA VARIABLES
 
-# Motor
+# Motor (Korrigera portarna då dessa stämmer inte)
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.C)
+
+left_lift = Motor(Port.D)
+right_lift = Motor(Port.A)
 
 # Color sensor.
 line_sensor = ColorSensor(Port.S3)
@@ -56,9 +59,14 @@ def line_follow (robot, line_sensor, left_motor, right_motor): # måste ändra t
         wait(10)
 
 def pick_up_fail_detection():
+    pass
+
+def pick_up_(left_lift, right_lift):
+    pass
 
 
 # over
+
 def main():
     
     return 0
