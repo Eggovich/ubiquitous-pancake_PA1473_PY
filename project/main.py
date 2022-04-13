@@ -56,7 +56,6 @@ def line_follow ():
         wait(10)
 
 
-
 # over
 def main():
     
