@@ -67,6 +67,8 @@ def pick_up_fail_detection():
 def pick_up_(left_lift, right_lift):
     pass
 
+# function used inside line_follow to determine the line it should follow. 
+# Must have a variabel that sends the correct line to follow depending on where we want the robot to go.
 def color_line_follow():
     for color in possible_colors:
         if color == color.YELLOW:
