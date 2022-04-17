@@ -22,7 +22,7 @@ right_lift = Motor(Port.A)
 line_sensor = ColorSensor(Port.S3)
 
 # All the colors
-possible_colors = [color.RED, color.GREEN, color.BLUE, color.BROWN]
+possible_colors = [color.RED, color.GREEN, color.BLUE, color.BROWN, color.YELLOW]
 
 # Drive base.
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
@@ -68,7 +68,20 @@ def pick_up_(left_lift, right_lift):
     pass
 
 def color_line_follow():
-    
+    for color in possible_colors:
+        if color == color.YELLOW:
+            pass
+        elif color == color.RED:
+            pass
+        elif color == color.BLUE:
+            pass
+        elif color == color.BROWN:
+            pass
+        elif color == color.GREEN:
+            pass
+    pass
+
+
 
 # over
 
