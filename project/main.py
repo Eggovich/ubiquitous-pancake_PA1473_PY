@@ -69,22 +69,22 @@ def pick_up_(left_lift, right_lift):
 
 # Function determining which way it should go
 def direction():
-    
+
 
 # function used inside line_follow to determine the line it should follow. 
 # Must have a variabel that sends the correct line to follow depending on where we want the robot to go.
 def color_line_follow():
     route_choice = 
     for color in possible_colors:
-        if color == color.YELLOW:
+        while color == color.YELLOW:
+            line_follow()
+        while color == color.RED:
             pass
-        elif color == color.RED:
+        while color == color.BLUE:
             pass
-        elif color == color.BLUE:
+        while color == color.BROWN:
             pass
-        elif color == color.BROWN:
-            pass
-        elif color == color.GREEN:
+        while color == color.GREEN:
             pass
     pass
 
