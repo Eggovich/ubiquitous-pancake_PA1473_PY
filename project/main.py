@@ -5,7 +5,7 @@ import sys
 
 
 from pybricks.ev3devices import Motor, ColorSensor
-from pybricks.parameters import Port,  Direction, stop
+from pybricks.parameters import Port,  Direction, stop, color
 from pybricks.tools import wait
 from pybricks.robotics import DriveBase
 
@@ -20,6 +20,9 @@ right_lift = Motor(Port.A)
 
 # Color sensor.
 line_sensor = ColorSensor(Port.S3)
+
+# All the colors
+possible_colors = [color.RED, color.GREEN, color.BLUE, color.BROWN]
 
 # Drive base.
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
@@ -64,6 +67,8 @@ def pick_up_fail_detection():
 def pick_up_(left_lift, right_lift):
     pass
 
+def color_line_follow():
+    
 
 # over
 
