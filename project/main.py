@@ -17,7 +17,7 @@ right_motor = Motor(Port.B)
 
 Crane_motor = Motor(Port.A, positive_direction=Direction.CLOCKWISE, gears = [12, 36])
 
-Front_button=Port.S1
+Front_button = Port.S1
 
 Ultrasonic_sensor = UltrasonicSensor(Port.S4)
 
