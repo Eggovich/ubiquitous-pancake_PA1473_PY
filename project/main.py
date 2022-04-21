@@ -31,18 +31,19 @@ def line_follow (robot): # måste ändra till våra värden!!!!!!!!
     threshold = threshold_calculator(color_detection())
     # Calculate the light threshold. Choose values based on your measurements.
     # Set the drive speed at 100 millimeters per second.
-    DRIVE_SPEED = 100
+    DRIVE_SPEED = 70
     # Set the gain of the proportional line controller. This means that for every
     # percentage point of light deviating from the threshold, we set the turn
     # rate of the drivebase to 1.2 degrees per second.
     # For example, if the light value deviates from the threshold by 10, the robot
     # steers at 10*1.2 = 12 degrees per second.
-    PROPORTIONAL_GAIN = 1.2
+    PROPORTIONAL_GAIN = 2
 
     # Start following the line endlessly.
     detect = False
     while detect is False:
-        
+        #Updates the current color-correction
+        threshold = threshold_calculator(color_detection())
         # Calculate the deviation from the threshold.
         deviation = Color_sensor.reflection() - threshold
 
@@ -53,37 +54,35 @@ def line_follow (robot): # måste ändra till våra värden!!!!!!!!
         robot.drive(DRIVE_SPEED, turn_rate)
 
         # Detection-process.
-        detect = detecting_obsticvls()
+        detect = detecting_obstacles()
 
 
-def threshold_calculator(color):#Värden ska ändras
-    if color == color.YELLOW:
+def threshold_calculator(color):
+    threshold = 50#Värden ska ändras
+    if color == 2:
         threshold = 50
-    elif color == color.BLUE:
+    elif color == 3:
         threshold = 50
-    elif color == color.RED:
+    elif color == 4:
         threshold = 50
-    elif color == color.BLACK:
+    elif color == 5:
         threshold = 50
-    elif color == color.WHITE:
+    elif color == 6:
         threshold = 50
     return threshold
 
 
-def pick_up_pallet(robot):
-    try: 
-        while Front_button.pressed() is not True:
-            robot.straight(10)
-        if Front_button.pressed() is True:
-            Crane_motor.run_untill_stalled(50, then = stop.HOLD, duty_limit = 60)
-            if Front_button.pressed() is False:
-                pick_up_fail_detection(Crane_motor)
-            robot.straight(-80)
-            robot.turn(180)
-        else:
-            try_pickup_again(robot)
-    except:
-        print("Another problem")
+def pick_up_pallet(robot): 
+    while Front_button.pressed() is not True:
+        robot.straight(10)
+    if Front_button.pressed() is True:
+        Crane_motor.run_untill_stalled(50, then = stop.HOLD, duty_limit = 60)
+        robot.straight(-80)
+        robot.turn(180)
+    if Front_button.pressed() is False:
+        pick_up_fail_detection(Crane_motor)
+    else:
+        try_pickup_again(robot)
 
       
 def try_pickup_again(robot):
@@ -91,17 +90,13 @@ def try_pickup_again(robot):
     robot.turn(270)
     robot.straight(5) #how big of a sidement adjustment
     robot.turn(90)
-    robot.straight(100)
+    pick_up_pallet(robot)
 
 
 def pick_up_fail_detection(Crane_motor):
-    try:
-        print("Pick up fail detection noticed")
-        Crane_motor.run_untill_stalled(-50, then = stop, duty_limit = None)
-        return False
-        
-    except:
-        print("something else went wrong")
+    print("Pick up fail detection noticed")
+    Crane_motor.run_untill_stalled(-50, then = stop, duty_limit = None)
+    return False
 
 
 # Function determining which way it should go
@@ -110,8 +105,8 @@ def direction():
 
 
 # Detecing obsticals infront of the robot
-def detecting_obsticvls():
-    if us.distance_centimeters() > 20:
+def detecting_obstacles():
+    if us.distance_centimeters() < 20:
         detect = True
     else:
         detect = False
