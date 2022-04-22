@@ -130,10 +130,10 @@ def road_choice(choice, current_color):
 def main():
     line_follow(robot)
     #Line_up_function()
-    pick_up_pallet(robot)
+    #pick_up_pallet(robot)
         
 
-
+line_follow(robot)
 
 # ---------------------------- Ignore this ------------------------------------
 if __name__ == '__main__':
