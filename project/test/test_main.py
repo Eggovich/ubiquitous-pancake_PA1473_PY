@@ -56,14 +56,14 @@ def line_follow (robot): # måste ändra till våra värden!!!!!!!!
         # Detection-process.
         detect = detecting_obstacles()
     
-def line_follow_2()
+def line_follow_2():
     threshold = threshold_calculator(color_detection())
     DRIVE_SPEED = -70
     PROPORTIONAL_GAIN = 2
 
     path = True
     # Start following the line endlessly.
-    while path = True:
+    while path == True:
         #Updates the current color-correction
         threshold = threshold_calculator(color_detection())
         # Calculate the deviation from the threshold.
