@@ -1,6 +1,7 @@
 #!/usr/bin/env pybricks-micropython
 
 #BIBLIOTEK
+from pickle import NONE
 import sys
 
 from pybricks.hubs import EV3Brick
@@ -33,7 +34,8 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter = 47, axle_track = 128
 def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR):
     threshold = threshold_calculator(color_detection())
     fc = color_detection()
-    f=0
+    approved_colors = [fc, dest, CIRCLE_COLOR, Color.WHITE]
+    cc = 0
     detect = False
     dest_zone = False
     circle_check = False
@@ -48,22 +50,25 @@ def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR):
             threshold = threshold_calculator(color_detection())
             robot.turn(-90)
             dest_check = True
+            cc = 0
             
         elif color_detection() == CIRCLE_COLOR and circle_check is False:
             threshold = threshold_calculator(color_detection())
             robot.turn(-90)
             circle_check = True
+            cc = 0
+        
         # Calculate the deviation from the threshold.
         deviation = Color_sensor.reflection() - threshold
         turn_rate = PROPORTIONAL_GAIN * deviation
-        if color_detection() != fc and color_detection() != dest and color_detection() != CIRCLE_COLOR and color_detection() != Color.WHITE:
-            f += 1
-            if f > 4:
+        if color_detection() not in approved_colors:
+            cc += 1
+            if cc > 5:
                 robot.turn(30)
-                f = 0
+                cc = 0
         if circle_check is True:
             fc = None
-            
+        
         #print(Color_sensor.reflection())
         # Calculate the turn rate.
         if dest_zone is False and detect is False:
@@ -106,7 +111,7 @@ def pick_up_pallet(robot):
 
  
 def detecting_zones(color):
-    if color == 1:
+    if color == Color.BLACK:
         dest_zone = True
     else:
         dest_zone = False
