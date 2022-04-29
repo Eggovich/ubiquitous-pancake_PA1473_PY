@@ -4,8 +4,8 @@
 import sys
 
 from pybricks.hubs import EV3Brick
-from pybricks.ev3devices import Motor, ColorSensor, UltrasonicSensor
-from pybricks.parameters import Port,  Direction, stop, color
+from pybricks.ev3devices import Motor, ColorSensor, UltrasonicSensor, TouchSensor
+from pybricks.parameters import Port,  Direction, Stop, Color
 from pybricks.tools import wait
 from pybricks.robotics import DriveBase
 
@@ -15,14 +15,16 @@ ev3 = EV3Brick()
 left_motor = Motor(Port.C)
 right_motor = Motor(Port.B)
 Crane_motor = Motor(Port.A, positive_direction=Direction.CLOCKWISE, gears = [12, 36])
-Front_button = Port.S1
+Front_button = TouchSensor(Port.S1)
 us = UltrasonicSensor(Port.S4)
 # Color sensor.
 Color_sensor = ColorSensor(Port.S3)
 # Mid sector color
-CIRCLE_COLOR = 4
-DRIVE_SPEED = 70
+POSSIBLE_COLORS = [Color.GREEN,Color.RED,Color.WHITE,Color.BLACK,Color.BLUE,Color.YELLOW,Color.PURPLE,Color.BROWN,]
+CIRCLE_COLOR = Color.BROWN
+DRIVE_SPEED = -80
 PROPORTIONAL_GAIN = 1.2
+ANGLE_CONSTANT = 3.2
 # Drive base. #wheel_diameter= 47, axle_track= 128
 robot = DriveBase(left_motor, right_motor, wheel_diameter = 47, axle_track = 128)
 
@@ -30,6 +32,8 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter = 47, axle_track = 128
 
 def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR):
     threshold = threshold_calculator(color_detection())
+    fc = color_detection()
+    f=0
     detect = False
     dest_zone = False
     circle_check = False
@@ -38,6 +42,7 @@ def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR):
         # Detection-process.
         dest_zone = detecting_zones(color_detection())
         detect = detecting_obstacles()
+       
         # Checking for specific color on our route
         if color_detection() == dest and dest_check is False:
             threshold = threshold_calculator(color_detection())
@@ -50,9 +55,17 @@ def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR):
             circle_check = True
         # Calculate the deviation from the threshold.
         deviation = Color_sensor.reflection() - threshold
-
-        # Calculate the turn rate.
         turn_rate = PROPORTIONAL_GAIN * deviation
+        if color_detection() != fc and color_detection() != dest and color_detection() != CIRCLE_COLOR and color_detection() != Color.WHITE:
+            f += 1
+            if f > 4:
+                robot.turn(30)
+                f = 0
+        if circle_check is True:
+            fc = None
+            
+        #print(Color_sensor.reflection())
+        # Calculate the turn rate.
         if dest_zone is False and detect is False:
         # Set the drive base speed and turn rate.
             robot.drive(DRIVE_SPEED, turn_rate)
@@ -61,35 +74,37 @@ def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR):
 
 
 def threshold_calculator(color):#Värden ska ändras
-    WHITE_REF = 100
-    if color == 2: #Blå
-        threshold = (WHITE_REF + 0)/2
-    elif color == 3: #Grön
-        threshold = (WHITE_REF + 7)/2
-    elif color == 4: #Gul
+    WHITE_REF = 94
+    threshold = 50
+    if str(color) == "Color.BLUE": #Blå
+        threshold = (WHITE_REF + 16)/2
+    elif str(color) == "Color.GREEN": #Grön
+        threshold = (WHITE_REF + 13)/2
+    elif str(color) == "Color.YELLOW": #Gul
         threshold = (WHITE_REF + 41)/2
-    elif color == 5: #Röd
-        threshold = (WHITE_REF + 38)/2
-    elif color == 1: #Svart
+    elif str(color) == "Color.RED": #Röd
+        threshold = (WHITE_REF + 82.5)/2
+    elif str(color) == "Color.BLACK": #Svart
         threshold = (WHITE_REF + 0)/2
-    elif color == 7: #Brun
-        threshold = 50
+    elif str(color) == "Color.BROWN": #Brun
+        threshold = (WHITE_REF + 20)/2
+    print(threshold)
     return threshold
 
 
 def pick_up_pallet(robot): 
     while Front_button.pressed() is not True:
-        robot.straight(10)
+        robot.straight(-10)
     if Front_button.pressed() is True:
-        Crane_motor.run_untill_stalled(50, then = stop.HOLD, duty_limit = 60)
-        robot.straight(-80)
-        robot.turn(180)
+        Crane_motor.run_time(-100, 5000, then = Stop.HOLD, wait=True)
+        robot.turn(ANGLE_CONSTANT * 180 ) #90 grader
+
     if Front_button.pressed() is False:
         pick_up_fail_detection(Crane_motor)
     else:
         try_pickup_again(robot)
 
-
+ 
 def detecting_zones(color):
     if color == 1:
         dest_zone = True
@@ -99,6 +114,7 @@ def detecting_zones(color):
 
       
 def try_pickup_again(robot):
+    print('JO')
     robot.straight(-100)
     robot.turn(270)
     robot.straight(5) #how big of a sidement adjustment
@@ -108,16 +124,16 @@ def try_pickup_again(robot):
 
 def pick_up_fail_detection(Crane_motor):
     print("Pick up fail detection noticed")
-    Crane_motor.run_untill_stalled(-50, then = stop, duty_limit = None)
-    return False
+    Crane_motor.run_until_stalled(-50, then = Stop.HOLD, duty_limit = None)
+    
 
 # Function determining which way it should go
 def destination():
-    return int(input("Välj destinations-färg (1:Svart ,2:Blått, 3:Grönt, 4:Gult, 5:Rött, 7:Brunt)"))
+    return Color.RED
 
 # Detecing obsticals infront of the robot
 def detecting_obstacles():
-    if us.distance_centimeters() < 20:
+    if us.distance() < 20:
         detect = True
     else:
         detect = False
@@ -142,10 +158,15 @@ def main():
     detect, dest_zone = line_follow(robot, destination(), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR)
     #Line_up_function()
     #pick_up_pallet(robot)
-        
+    #robot.straight(90)
+    
+main()
+#Crane_motor.run_until_stalled(50, then=Stop.HOLD, duty_limit = None)
+      
 
-detect, dest_zone = line_follow(robot, destination(), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR)
-print(detect, dest_zone)
+#detect, dest_zone = line_follow(robot, destination(), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR)
+#print(detect, dest_zone)
+
 
 # ---------------------------- Ignore this ------------------------------------
 if __name__ == '__main__':
