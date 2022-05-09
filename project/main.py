@@ -31,10 +31,10 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter = 47, axle_track = 128
 
 # ---------------------------The logic under-----------------------
 
-def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR):
+def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, pallet):
     threshold = threshold_calculator(color_detection())
     fc = color_detection()
-    approved_colors = [fc, dest, CIRCLE_COLOR, Color.WHITE]
+    approved_colors = [fc, dest, CIRCLE_COLOR, Color.WHITE, Color.BLACK]
     cc = 0
     detect = False
     dest_zone = False
@@ -58,6 +58,11 @@ def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR):
             circle_check = True
             cc = 0
         
+
+        if pallet is True:
+            if Front_button.pressed() is False:
+                detect = True
+        
         # Calculate the deviation from the threshold.
         deviation = Color_sensor.reflection() - threshold
         turn_rate = PROPORTIONAL_GAIN * deviation
@@ -75,7 +80,7 @@ def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR):
         # Set the drive base speed and turn rate.
             robot.drive(DRIVE_SPEED, turn_rate)
     robot.stop()
-    return detect, dest_zone
+    return detect, dest_zone, fc
 
 
 def threshold_calculator(color):#Värden ska ändras
@@ -104,9 +109,8 @@ def pick_up_pallet(robot):
         Crane_motor.run_time(-100, 5000, then = Stop.HOLD, wait=True)
         robot.turn(ANGLE_CONSTANT * 180 ) #90 grader
 
-    if Front_button.pressed() is False:
-        pick_up_fail_detection(Crane_motor)
-        #try_pickup_again(robot)
+    pallet = True
+    return pallet
 
  
 def detecting_zones(color):
@@ -118,7 +122,6 @@ def detecting_zones(color):
 
       
 def try_pickup_again(robot):
-    print('JO')
     robot.straight(-100)
     robot.turn(270)
     robot.straight(5) #how big of a sidement adjustment
@@ -132,8 +135,13 @@ def pick_up_fail_detection(Crane_motor):
     
 
 # Function determining which way it should go
-def destination():
-    return Color.RED
+def destination(home, fc):
+    if home is True:
+        dest = Color.RED
+    else:
+        dest = fc
+    return dest
+
 
 # Detecing obsticals infront of the robot
 def detecting_obstacles():
@@ -148,7 +156,6 @@ def detecting_obstacles():
 # Must have a variabel that sends the correct line to follow depending on where we want the robot to go.
 def color_detection():
     color = Color_sensor.color()
-    print(color)
     return color
         
             
@@ -156,15 +163,23 @@ def road_choice(choice, current_color):
     pass
 
 
+def calibration(robot):
+    reflect = []
+    for _ in range(100):
+        robot.drive(10)
+        reflect.append(Color_sensor.reflection())
+    return min(reflect), Color_sensor.color()
 # ---------------------------- Main funktion ----------------------------------
 
 def main():
-    detect, dest_zone = line_follow(robot, destination(), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR)
+    pallet = False
+    detect, dest_zone, fc = line_follow(robot, destination(True,None), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, pallet)
     #Line_up_function()
-    #pick_up_pallet(robot)
-    #robot.straight(90)
+    if dest_zone is True:
+        pallet = pick_up_pallet(robot)
+        detect, dest_zone, fc = line_follow(robot, destination(False,fc), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, pallet)
     
-main()
+print(calibration(robot))
 #Crane_motor.run_until_stalled(50, then=Stop.HOLD, duty_limit = None)
       
 
