@@ -106,8 +106,7 @@ def pick_up_pallet(robot):
 
     if Front_button.pressed() is False:
         pick_up_fail_detection(Crane_motor)
-    else:
-        try_pickup_again(robot)
+        #try_pickup_again(robot)
 
  
 def detecting_zones(color):
