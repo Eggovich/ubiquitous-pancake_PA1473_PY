@@ -155,14 +155,15 @@ def destination(home, fc):
     return dest
 
 
-
 # Detecing obstacals infront of the robot
 def detecting_obstacles():
-    if int(us.distance()) < 200:
+    if int(us.distance()) < 200 and us.presence() is False:
         detect = True
+        print("Något som inte är en robot står i vägen")
     else:
         detect = False
     return detect
+
 
 def detecting_other_robot(robot):
     while us.presence() is True and us.distance() < 200:
@@ -177,13 +178,9 @@ def detecting_other_robot(robot):
 def color_detection():
     color = Color_sensor.color()
     return color
-        
-            
-def road_choice(choice, current_color):
-    pass
 
 
-def calibration(robot):
+def calibration():
     reflect = []
     for _ in range(100):
         print(Color_sensor.reflection())
@@ -197,18 +194,13 @@ def main():
     #Line_up_function()
     if dest_zone is True:
         pallet = pick_up_pallet(robot)
-        print(destination(False,fc))
         detect, dest_zone, fc = line_follow(robot, destination(False,fc), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, pallet)
     
 
 #Crane_motor.run_until_stalled(50, then=Stop.HOLD, duty_limit = None)
-      
-
-#detect, dest_zone = line_follow(robot, destination(), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR)
-#print(detect, dest_zone)
-
+print(calibration())
 
 # ---------------------------- Ignore this ------------------------------------
-if __name__ == '__main__':
-    sys.exit(main())
+#if __name__ == '__main__':
+#    sys.exit(main())
 
