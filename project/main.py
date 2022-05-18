@@ -31,22 +31,21 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter = 47, axle_track = 128
 
 # ---------------------------The logic under-----------------------
 
-def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, pallet):
+def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, pallet,fc):
     threshold = threshold_calculator(color_detection())
-    fc = color_detection()
     approved_colors = [fc, dest, CIRCLE_COLOR, Color.WHITE, Color.BLACK]
-    print(approved_colors)
+    #print(approved_colors)
     cc = 0
     detect = False
     dest_zone = 0
     circle_check = False
     dest_check = False
-    while detect is False and dest_zone < 5:
+    while detect is False and dest_zone < 4:
         # Detection-process.
         dest_zone += detecting_zones(color_detection())
-        print(dest_zone)
-        print(color_detection())
-        print(Color_sensor.reflection())
+        #print(dest_zone)
+        #print(color_detection())
+        #print(Color_sensor.reflection())
         detecting_other_robot(robot)
         detect = detecting_obstacles()
         if dest_zone < 1:
@@ -54,14 +53,22 @@ def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, palle
         #print(Color_sensor.reflection())
         # Checking for specific color on our route
         if color_detection() == dest and dest_check is False and circle_check is True:
-            threshold = threshold_calculator(color_detection())
-            robot.turn(90)
-            dest_check = True
-            cc = 0
-            
+            if dest == Color.BLUE:
+                if rgb_check() is True:
+                    threshold = threshold_calculator(color_detection())
+                    robot.turn(-90)
+                    dest_check = True
+                    cc = 0
+                else:
+                    robot.turn(15*ANGLE_CONSTANT)
+            else:
+                threshold = threshold_calculator(color_detection())
+                robot.turn(-90)
+                dest_check = True
+                cc = 0
         elif color_detection() == CIRCLE_COLOR and circle_check is False:
             threshold = threshold_calculator(color_detection())
-            robot.turn(90)
+            #robot.turn(-90)
             circle_check = True
             cc = 0
         
@@ -75,7 +82,7 @@ def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, palle
         if color_detection() not in approved_colors:
             cc += 1
             if cc > 4:
-                robot.turn(-30*ANGLE_CONSTANT)
+                robot.turn(30*ANGLE_CONSTANT)
                 cc = 0
         else:
             cc = 0
@@ -92,16 +99,22 @@ def line_follow(robot, dest, DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, palle
         dest_zone = False
     else:
         dest_zone = True
-    return detect, dest_zone, fc
+    return detect, dest_zone, fc, dest
+
+def rgb_check():
+    result = False
+    if Color_sensor.rgb()[1] > 23 and Color_sensor.rgb()[1] < 30 and Color_sensor.color() == Color.BLUE:
+        result = True
+    return result
 
 
 def threshold_calculator(color):#Värden ska ändras
-    WHITE_REF = 82
+    WHITE_REF = 87
     threshold = 50
     if str(color) == "Color.BLUE": #Blå
         threshold = (WHITE_REF + 14)/2
     elif str(color) == "Color.GREEN": #Grön
-        threshold = (WHITE_REF + 11)/2
+        threshold = (WHITE_REF + 13)/2
     elif str(color) == "Color.YELLOW": #Gul
         threshold = (WHITE_REF + 41)/2
     elif str(color) == "Color.RED": #Röd
@@ -109,7 +122,7 @@ def threshold_calculator(color):#Värden ska ändras
     elif str(color) == "Color.BLACK": #Svart
         threshold = (WHITE_REF + 0)/2
     elif str(color) == "Color.BROWN": #Brun
-        threshold = (WHITE_REF + 20)/2
+        threshold = (WHITE_REF + 21)/2
     #print(threshold)
     return threshold
 
@@ -157,7 +170,9 @@ def destination(home, fc):
 
 # Detecing obstacals infront of the robot
 def detecting_obstacles():
-    if int(us.distance()) < 200 and us.presence() is False:
+    print(us.distance())
+    dist = us.distance()
+    if dist < 500 and us.presence() is False and dist >= 326:
         detect = True
         print("Något som inte är en robot står i vägen")
     else:
@@ -166,8 +181,9 @@ def detecting_obstacles():
 
 
 def detecting_other_robot(robot):
-    while us.presence() is True and us.distance() < 200:
-        robot.brake()
+    print(us.distance())
+    dist = us.distance()
+    while us.presence() is True and dist < 600 and dist >= 326:
         robot.stop()
         time.sleep(4)
         print('Detected other robot')
@@ -190,17 +206,23 @@ def calibration():
 
 def main():
     pallet = False
-    detect, dest_zone, fc = line_follow(robot, destination(True,None), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, pallet)
+    fc = Color.GREEN
+    detect, dest_zone, fc, dest = line_follow(robot, destination(True,None), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, pallet, fc)
     #Line_up_function()
     if dest_zone is True:
         pallet = pick_up_pallet(robot)
-        detect, dest_zone, fc = line_follow(robot, destination(False,fc), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, pallet)
-    
+        detect, dest_zone, fc, dest = line_follow(robot, destination(False,fc), DRIVE_SPEED, PROPORTIONAL_GAIN, CIRCLE_COLOR, pallet, dest)
+    else:
+        print("Something went wrong")
 
 #Crane_motor.run_until_stalled(50, then=Stop.HOLD, duty_limit = None)
-print(calibration())
+#print(calibration())
+#print(Color_sensor.rgb()[1])
 
 # ---------------------------- Ignore this ------------------------------------
-#if __name__ == '__main__':
-#    sys.exit(main())
+if __name__ == '__main__':
+    sys.exit(main())
 
+
+#(19, 13, 72),(14, 10, 48),(18, 11, 63),(16, 12, 66),(15, 11, 50) (14-19, 10-13, 48-72) LILA
+#(14, 23, 64),(16, 30, 86),(15, 26, 72),(15, 26, 73),(15, 27, 77) (14-16, 23-30, 64-86)
