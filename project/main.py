@@ -4,8 +4,7 @@ from pybricks.parameters import Port,  Direction, Stop, Color
 from pybricks.tools import wait
 from pybricks.robotics import DriveBase
 import time
-from pybricks.ev3devices import Motor,
-ColorSensor, UltrasonicSensor, TouchSensor
+from pybricks.ev3devices import Motor, ColorSensor, UltrasonicSensor, TouchSensor
 
 
 # Group 17 - Egon Grans, Noel Freij,
@@ -55,8 +54,7 @@ def line_follow(robot, dest, DRIVE_SPEED,
 
         # Checking for specific color on our route
         # to turn 90 degrees if requriement are met
-        if color_detection() == dest and dest_check is False
-        and circle_check is True:
+        if color_detection() == dest and dest_check is False and circle_check is True:
             if dest == Color.BLUE:
                 if rgb_check() is True:
                     threshold = threshold_calculator(color_detection())
@@ -113,8 +111,7 @@ def line_follow(robot, dest, DRIVE_SPEED,
 # Checks if color is that is seen is blue or purple
 def rgb_check():
     result = False
-    if Color_sensor.rgb()[1] > 13 and Color_sensor.rgb()[1] < 30
-    and Color_sensor.color() == Color.BLUE:
+    if Color_sensor.rgb()[1] > 13 and Color_sensor.rgb()[1] < 30 and Color_sensor.color() == Color.BLUE:
         result = True
     return result
 
